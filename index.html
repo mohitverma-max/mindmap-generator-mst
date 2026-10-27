@@ -1,0 +1,632 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Topical Map Generator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Free tool by Mohit's SEO Training. Drop your topic ideas, and get a sorted topical map as a mind map, tree, silo or funnel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Same navy glass world as the Question Finder: aurora light, frosted search panel, the map as a glowing hero image with style tabs, then sorted cluster cards. Single dark look by design. */
+:root{
+  --navy:#23386f; --teal:#4590a5; --teal-bright:#7fd3e6; --ice:#dfeaf6; --gold:#f2c46d; --violet:#8fa2ff;
+  --bg:#070e22; --bg-2:#0c1836;
+  --glass:rgba(255,255,255,.06); --glass-2:rgba(255,255,255,.1); --glass-line:rgba(255,255,255,.12);
+  --ink:#eef3fb; --muted:#9fb0cc; --glow:rgba(127,211,230,.35);
+  --font-display:"Outfit","Segoe UI",system-ui,sans-serif;
+  --font-body:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  background:
+    radial-gradient(700px 420px at 12% -5%, rgba(69,144,165,.38), transparent 65%),
+    radial-gradient(760px 480px at 95% 8%, rgba(35,56,111,.75), transparent 65%),
+    radial-gradient(900px 600px at 50% 110%, rgba(69,144,165,.22), transparent 70%),
+    linear-gradient(180deg,var(--bg-2),var(--bg));
+  background-attachment:fixed;
+  color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;min-height:100%;
+}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 75%)}
+.wrap{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 44px;display:grid;gap:20px}
+h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+:focus-visible{outline:2px solid var(--teal-bright);outline-offset:3px}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* Search panel */
+.searchbar{position:relative;border-radius:24px;padding:24px;
+  background:linear-gradient(135deg,rgba(35,56,111,.55),rgba(69,144,165,.28));
+  border:1px solid var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 60px -30px rgba(0,0,0,.7);
+  display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;animation:rise .5s ease both}
+.searchbar::before{content:"";position:absolute;inset:-1px;border-radius:24px;padding:1px;pointer-events:none;
+  background:linear-gradient(120deg,rgba(127,211,230,.7),transparent 35%,transparent 65%,rgba(127,211,230,.45));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.field{display:grid;gap:7px;min-width:0}
+.field label,.lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-bright);font-weight:600}
+.field.wide{grid-column:1/-1}
+select,input[type="text"],textarea{font:inherit;color:var(--ink);background:rgba(7,14,34,.55);border:1px solid var(--glass-line);border-radius:14px;padding:13px 15px;width:100%;transition:border-color .2s,box-shadow .2s}
+textarea{resize:vertical;min-height:120px;line-height:1.5}
+select option{background:#0c1836;color:var(--ink)}
+input::placeholder,textarea::placeholder{color:rgba(223,234,246,.45)}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal-bright);box-shadow:0 0 0 4px rgba(127,211,230,.15)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ice);cursor:pointer;text-transform:none;letter-spacing:0;font-weight:500}
+.check input{accent-color:var(--teal-bright);width:16px;height:16px}
+.btn{border:0;background:linear-gradient(120deg,var(--navy),var(--teal));color:#fff;font:inherit;font-weight:600;border-radius:14px;padding:13px 22px;cursor:pointer;transition:transform .15s,box-shadow .2s,filter .2s}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1);box-shadow:0 14px 30px -12px var(--glow)}
+.btn:disabled{opacity:.6;cursor:progress;transform:none}
+.searchbar .btn{background:linear-gradient(120deg,#ffffff,var(--ice));color:#0c1836;padding:13px 26px;box-shadow:0 12px 30px -12px rgba(127,211,230,.55)}
+.btn-ghost{border:1px solid var(--glass-line);background:var(--glass);color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;border-radius:999px;padding:9px 16px;cursor:pointer;transition:border-color .2s,background .2s}
+.btn-ghost:hover{border-color:var(--teal-bright);background:var(--glass-2)}
+@media (max-width:640px){.searchbar{grid-template-columns:1fr;padding:18px}}
+
+.notice{background:var(--glass);border:1px solid var(--glass-line);color:var(--ice);border-radius:14px;padding:11px 16px;font-size:14px;display:flex;gap:10px;align-items:center}
+.notice::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal-bright);box-shadow:0 0 12px var(--teal-bright);flex:none}
+.progress{height:4px;border-radius:4px;background:var(--glass-2);overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--teal-bright));box-shadow:0 0 12px var(--teal-bright);transition:width .2s}
+
+/* Style tabs + stats */
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;animation:rise .5s .05s ease both}
+.tabs{display:inline-flex;flex-wrap:wrap;gap:4px;padding:5px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.tab{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:14px;padding:9px 18px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:color .2s,background .2s}
+.tab svg{width:16px;height:16px}
+.tab:hover{color:#fff}
+.tab[aria-pressed="true"]{color:#0c1836;background:linear-gradient(120deg,#fff,var(--ice));box-shadow:0 8px 20px -10px rgba(127,211,230,.7)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{font-size:13px;font-weight:600;color:var(--ice);background:var(--glass);border:1px solid var(--glass-line);padding:5px 12px;border-radius:999px;font-variant-numeric:tabular-nums}
+.stat b{color:#fff}
+
+/* Map image */
+.shot{margin:0;display:grid;gap:10px;animation:rise .6s .08s ease both}
+.shot-btn{position:relative;border:0;padding:1px;border-radius:26px;cursor:zoom-in;display:block;width:100%;
+  background:linear-gradient(140deg,rgba(127,211,230,.8),rgba(35,56,111,.6) 40%,rgba(69,144,165,.8));
+  box-shadow:0 40px 80px -40px rgba(69,144,165,.6),0 0 0 1px rgba(255,255,255,.04);transition:transform .25s,box-shadow .25s}
+.shot-btn img{display:block;width:100%;height:auto;border-radius:25px;background:#0a1430}
+.shot-btn:hover{transform:translateY(-3px) scale(1.003);box-shadow:0 50px 90px -40px rgba(127,211,230,.55)}
+.shot-badge{position:absolute;top:16px;right:16px;display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.shot-badge svg{width:14px;height:14px}
+.shot figcaption{font-size:13px;color:var(--muted);text-align:center}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+
+/* Sorted map cards */
+.mhead{display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap;margin-top:8px}
+.mhead h2{font-size:24px;background:linear-gradient(90deg,#fff,var(--teal-bright));-webkit-background-clip:text;background-clip:text;color:transparent}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.pillar{position:relative;border-radius:20px;padding:18px 20px;background:linear-gradient(120deg,var(--navy),var(--teal));box-shadow:0 24px 50px -24px rgba(69,144,165,.8);display:grid;gap:4px;animation:rise .5s ease both}
+.pillar small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.75);font-weight:600}
+.pillar h3{font-size:22px;color:#fff}
+.slug{font-family:var(--font-mono);font-size:12px;color:var(--teal-bright);overflow-wrap:anywhere}
+.pillar .slug{color:rgba(255,255,255,.8)}
+.clusters{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-items:start}
+.cluster{position:relative;background:var(--glass);border:1px solid var(--glass-line);border-radius:20px;padding:18px;display:grid;gap:6px;align-content:start;min-width:0;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform .2s,border-color .2s,box-shadow .2s;animation:rise .5s ease both}
+.cluster:hover{transform:translateY(-3px);border-color:rgba(127,211,230,.55);box-shadow:0 24px 48px -28px rgba(127,211,230,.55)}
+.cluster h3{font-size:17px;display:flex;align-items:center;gap:10px;color:#fff}
+.cluster h3 .ico{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:15px;font-family:var(--font-display);font-weight:700;color:#fff;background:linear-gradient(135deg,var(--c,var(--teal)),var(--navy));box-shadow:0 8px 18px -8px rgba(127,211,230,.7);flex:none}
+.cluster h3 small{margin-left:auto;font-family:var(--font-body);font-weight:600;font-size:12px;color:var(--teal-bright);background:rgba(127,211,230,.12);padding:3px 10px;border-radius:999px}
+.cluster .slug{margin:0 0 6px 44px}
+.cluster ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.cluster li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:7px 10px;border-radius:10px;font-size:14.5px;color:var(--ice);min-width:0;transition:background .15s}
+.cluster li:hover{background:rgba(127,211,230,.1);color:#fff}
+.cluster li span.t{overflow-wrap:anywhere;min-width:0}
+.dot{width:8px;height:8px;border-radius:50%}
+.st-tofu{background:var(--teal-bright)} .st-mofu{background:var(--violet)} .st-bofu{background:var(--gold)}
+.chip{font-family:var(--font-mono);font-size:10.5px;padding:2px 7px;border-radius:6px;border:1px solid var(--glass-line);color:var(--muted);white-space:nowrap}
+.chip.you{color:#0c1836;background:var(--teal-bright);border-color:transparent;font-weight:500}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(4,8,20,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;z-index:50;padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet{background:linear-gradient(160deg,#0f1d40,#0a1430);border:1px solid var(--glass-line);border-radius:24px;width:min(1120px,100%);max-height:100%;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;box-shadow:0 40px 90px -30px rgba(0,0,0,.8),0 0 60px -30px rgba(127,211,230,.5);animation:rise .3s ease both}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--glass-line)}
+.sheet-head h3{color:#fff;min-width:0;overflow-wrap:anywhere}
+.close{border:1px solid var(--glass-line);background:var(--glass);color:#fff;font-size:22px;line-height:1;cursor:pointer;width:38px;height:38px;border-radius:999px;flex:none}
+.close:hover{border-color:var(--teal-bright)}
+.big{overflow:auto;background:#0a1430;min-height:0}
+.big img{display:block;width:100%;height:auto}
+.dl{display:flex;flex-wrap:wrap;gap:14px;align-items:end;padding:18px 20px;border-top:1px solid var(--glass-line)}
+.dl .field{flex:0 1 240px}
+.fmt{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.fmt .btn{padding:11px 20px;border-radius:999px;font-family:var(--font-mono);font-size:13.5px;letter-spacing:.04em}
+
+footer{color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:14px;border-top:1px solid var(--glass-line)}
+footer a{color:var(--teal-bright);font-weight:600;text-decoration:none}
+footer a:hover{text-decoration:underline}
+.hint{color:var(--muted);font-size:13.5px;margin:0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:linear-gradient(120deg,var(--navy),var(--teal));color:#fff;padding:10px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;box-shadow:0 14px 30px -12px rgba(127,211,230,.5);z-index:60}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+
+<div class="wrap">
+  <form class="searchbar" id="form" autocomplete="off">
+    <div class="field wide">
+      <label for="ideas">Your topic ideas (one per line)</label>
+      <textarea id="ideas" placeholder="keyword research for youtube&#10;keyword research with chatgpt&#10;long tail keyword research&#10;keyword research tools"></textarea>
+    </div>
+    <p class="hint" style="align-self:center">The tool finds the main topic from your ideas and sorts them into a topical map.</p>
+    <button class="btn" id="go" type="submit">Generate map</button>
+  </form>
+
+  <div class="notice" id="notice"></div>
+
+  <div class="toolbar">
+    <div class="tabs" role="group" aria-label="Map style">
+      <button class="tab" type="button" data-style="mind" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="5" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="19" r="2"/><path d="M6 6l4 4M18 6l-4 4M6 18l4-4M18 18l-4-4"/></svg>Mind map</button>
+      <button class="tab" type="button" data-style="tree" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="10" width="5" height="4" rx="1"/><rect x="10" y="4" width="5" height="4" rx="1"/><rect x="10" y="16" width="5" height="4" rx="1"/><path d="M7 12h1.5V6H10M8.5 12v6H10M15 6h3M15 18h3"/></svg>Tree</button>
+      <button class="tab" type="button" data-style="silo" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="5" height="11" rx="1"/><rect x="9.5" y="10" width="5" height="11" rx="1"/><rect x="16" y="10" width="5" height="11" rx="1"/></svg>Silo</button>
+      <button class="tab" type="button" data-style="funnel" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h18l-3 5H6zM7 11h10l-2.5 5h-5zM10 18h4l-1 3h-2z"/></svg>Funnel</button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <figure class="shot" id="shot">
+    <button class="shot-btn" id="shotBtn" type="button" aria-label="Open the topical map to enlarge and download"><img id="mapImg" alt="Topical map"><span class="shot-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Enlarge &amp; download</span></button>
+    <figcaption>Switch styles above. Click the map to enlarge it and download it as PNG, JPG, WebP, SVG or PDF.</figcaption>
+  </figure>
+
+  <div class="actions">
+    <button class="btn-ghost" id="copyOutline" type="button">Copy outline</button>
+    <button class="btn-ghost" id="csv" type="button">Download CSV</button>
+  </div>
+
+  <div class="mhead">
+    <h2>Your topical map, sorted</h2>
+    <div class="legend"><span><i class="st-tofu"></i>Awareness (TOFU)</span><span><i class="st-mofu"></i>Consideration (MOFU)</span><span><i class="st-bofu"></i>Decision (BOFU)</span></div>
+  </div>
+  <div class="pillar" id="pillar"></div>
+  <div class="clusters" id="clusters"></div>
+
+  <footer>
+    <span>Free tool by <a href="https://mohitsseotraining.com/" target="_blank" rel="noopener">Mohit's SEO Training</a></span>
+    <a href="https://mohitsseotraining.com/free-seo-tool/" target="_blank" rel="noopener">More free SEO tools</a>
+  </footer>
+</div>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="Topical map download">
+  <div class="sheet">
+    <div class="sheet-head"><h3 id="modalTitle">Topical map</h3><button class="close" id="closeModal" type="button" aria-label="Close">×</button></div>
+    <div class="big"><img id="bigImg" alt="Topical map, full size"></div>
+    <div class="dl">
+      <div class="field"><label for="dlSize">Size</label><select id="dlSize"></select></div>
+      <div class="fmt">
+        <button class="btn" type="button" data-fmt="png">PNG</button>
+        <button class="btn" type="button" data-fmt="jpg">JPG</button>
+        <button class="btn" type="button" data-fmt="webp">WebP</button>
+        <button class="btn" type="button" data-fmt="svg">SVG</button>
+        <button class="btn" type="button" data-fmt="pdf">PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  // Clusters in reading order: learn it, do it, apply it, pick tools, compare, stay current, career, buy.
+  var CL={
+    basics:{name:'Fundamentals',short:'Basics',ico:'F',color:'#4fa3ba'},
+    howto:{name:'How-to & Strategy',short:'How-to',ico:'H',color:'#5b7fd1'},
+    audience:{name:'Use Cases & Audiences',short:'Use cases',ico:'U',color:'#3fb6a8'},
+    tools:{name:'Tools & Resources',short:'Tools',ico:'T',color:'#46a0d8'},
+    compare:{name:'Comparisons & Reviews',short:'Compare',ico:'C',color:'#7a8fe0'},
+    trends:{name:'Trends & AI',short:'Trends & AI',ico:'A',color:'#64c3d6'},
+    careers:{name:'Learning & Careers',short:'Careers',ico:'L',color:'#5c6fc4'},
+    cost:{name:'Cost & Services',short:'Cost',ico:'P',color:'#d9a95a'}
+  };
+  var ORDER=['basics','howto','audience','tools','compare','trends','careers','cost'];
+  var RULES=[
+    ['compare',/\b(vs|versus|alternatives?|reviews?)\b/],
+    ['cost',/\b(cost|costs|price|prices|pricing|fees?|cheap|affordable|agency|agencies|services?|company|companies|consultants?|freelancers?|hire|near me|packages?|quote|buy)\b/],
+    ['careers',/\b(courses?|certifications?|certificate|training|class|classes|learn|learning|jobs?|salary|career|careers|interview|resume|internships?|skills?|books?|tutorials?|bootcamp)\b/],
+    ['tools',/\b(tools?|software|apps?|plugins?|extensions?|templates?|platforms?|chrome|generator|checker|api|planner|spreadsheet|free)\b/],
+    ['compare',/\b(vs|versus|or|alternatives?|difference|differences|compare|comparison|reviews?|best|top|better)\b/],
+    ['trends',/\b(ai|future|trends?|20\d\d|latest|new|updates?|chatgpt|gemini|llm|statistics|stats|dead)\b/],
+    ['howto',/\b(how|steps?|process|strategy|strategies|plan|planning|checklist|tips|ways|framework|practices|optimi[sz]e|optimi[sz]ation|improve|increase|do|setup|audit|find|mistakes)\b/],
+    ['audience',/\bfor \w+|\b(small business|ecommerce|e-commerce|startups?|beginners?|local|b2b|saas|real estate|youtube|amazon|etsy|blogs?|bloggers?|shopify|wordpress|instagram|tiktok)\b/],
+    ['basics',/\b(what|meaning|definition|define|types?|basics?|examples?|introduction|overview|guide|explained|history|benefits?|importance|important|why|principles|glossary|terms|is)\b/]
+  ];
+  var STAGES={tofu:{name:'Awareness',tag:'TOFU',color:'#7fd3e6',intent:'Informational'},mofu:{name:'Consideration',tag:'MOFU',color:'#8fa2ff',intent:'Commercial'},bofu:{name:'Decision',tag:'BOFU',color:'#f2c46d',intent:'Transactional'}};
+  var BOFU=/\b(cost|costs|price|prices|pricing|fees?|cheap|affordable|agency|agencies|services?|company|companies|consultants?|freelancers?|hire|near me|packages?|quote|buy|discount|coupon)\b/;
+  var MOFU=/\b(best|top|vs|versus|reviews?|alternatives?|compare|comparison|tools?|software|courses?|certifications?|templates?|plugins?|apps?|extensions?|platforms?|worth)\b/;
+  var STOP=('a an the of to in on for with and or is are be by at from it its my your this that vs').split(' ');
+  var DIMS={mind:[1400,1100]};
+
+  var $=function(id){return document.getElementById(id);};
+  var state={kw:'',terms:[],model:null,style:'mind'};
+  var lastSvg='', lastW=1400, lastH=1100;
+
+  try{var st=localStorage.getItem('tm-style'); if(st) state.style=st;}catch(e){}
+
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+  function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('show');},1800);}
+  var ACRO={i:'I',seo:'SEO',ai:'AI',faq:'FAQ',faqs:'FAQs',ppc:'PPC',sem:'SEM',gbp:'GBP',ga4:'GA4',gsc:'GSC',uk:'UK',usa:'USA',us:'US',uae:'UAE',api:'API',crm:'CRM',saas:'SaaS',b2b:'B2B',b2c:'B2C',geo:'GEO',aeo:'AEO',llm:'LLM',chatgpt:'ChatGPT',google:'Google',youtube:'YouTube',india:'India',wordpress:'WordPress',shopify:'Shopify',amazon:'Amazon',semrush:'Semrush',ahrefs:'Ahrefs',ubersuggest:'Ubersuggest',tiktok:'TikTok',instagram:'Instagram',etsy:'Etsy',gemini:'Gemini',ecommerce:'ecommerce'};
+  function fixWords(s){return s.replace(/[A-Za-z0-9]+/g,function(w){return ACRO[w.toLowerCase()]||w;});}
+  function titleCase(s){return fixWords(s.split(' ').map(function(w){return w.length>2||ACRO[w.toLowerCase()]?cap(w):w;}).join(' '));}
+  function nice(s){return fixWords(cap(s));}
+  function slugify(s){return s.toLowerCase().replace(/[^a-z0-9\s-]/g,' ').trim().split(/\s+/).filter(function(w){return ['a','an','the'].indexOf(w)<0;}).join('-');}
+  function cut(s,n){return s.length>n?s.slice(0,n-1).trim()+'…':s;}
+
+  // ---------- text helpers ----------
+  function seedTokens(){return state.kw.toLowerCase().split(/\s+/).filter(function(w){return w.length>1;});}
+  function norm(s){return s.toLowerCase().replace(/[?!.]+$/,'').replace(/\s+/g,' ').trim();}
+  function relevant(s){var l=s.toLowerCase();return seedTokens().every(function(w){return l.indexOf(w)>-1;});}
+  function strip(s){var st=seedTokens();return ' '+norm(s).split(' ').filter(function(w){return st.indexOf(w)<0&&st.indexOf(w.replace(/s$/,''))<0;}).join(' ')+' ';}
+  function cluster(s){var x=strip(s);for(var i=0;i<RULES.length;i++)if(RULES[i][1].test(x))return RULES[i][0];return 'other';}
+  function stage(s){var x=strip(s);return BOFU.test(x)?'bofu':MOFU.test(x)?'mofu':'tofu';}
+  function contentWords(s){var st=seedTokens();return norm(s).replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(function(w){return w&&STOP.indexOf(w)<0&&st.indexOf(w)<0;});}
+  function dup(a,b){
+    var A=contentWords(a),B=contentWords(b);
+    if(A.slice().sort().join(' ')===B.slice().sort().join(' '))return true;
+    if(A.length<2||B.length<2)return false;
+    var inter=A.filter(function(w){return B.indexOf(w)>-1;}).length;
+    return inter/(A.length+B.length-inter)>=0.75;
+  }
+
+  // ---------- build the sorted model ----------
+  function build(){
+    var kept=[], seed=norm(state.kw);
+    state.terms.forEach(function(t){
+      var n=norm(t.text); if(!n||n===seed)return;
+      for(var i=0;i<kept.length;i++){ if(dup(kept[i].text,n)){ if(t.mine)kept[i].mine=true; return; } }
+      kept.push({text:n,mine:!!t.mine});
+    });
+    var groups={};
+    kept.forEach(function(t){t.cluster=cluster(t.text);t.stage=stage(t.text);(groups[t.cluster]=groups[t.cluster]||[]).push(t);});
+    var clusters=ORDER.filter(function(k){return groups[k];}).map(function(k){return {key:k,name:CL[k].name,short:CL[k].short,ico:CL[k].ico,color:CL[k].color,items:groups[k]};});
+    // Leftovers: group by their most shared word, the rest go to "More subtopics".
+    var rest=groups.other||[], palette=['#4fb0c4','#6b86d8','#48b9a0','#8a9be6'], pi=0;
+    while(rest.length){
+      var cnt={}; rest.forEach(function(t){contentWords(t.text).forEach(function(w){if(w.length>2)cnt[w]=(cnt[w]||0)+1;});});
+      var best=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];})[0];
+      if(!best||cnt[best]<3)break;
+      var take=rest.filter(function(t){return contentWords(t.text).indexOf(best)>-1;});
+      rest=rest.filter(function(t){return take.indexOf(t)<0;});
+      clusters.push({key:'w-'+best,name:titleCase(state.kw+' '+best),short:cut(cap(best),12),ico:best.charAt(0).toUpperCase(),color:palette[pi++%4],items:take});
+    }
+    if(rest.length)clusters.push({key:'more',name:'More Subtopics',short:'More',ico:'+',color:'#7d8fb5',items:rest});
+    var so={tofu:0,mofu:1,bofu:2}, ps=slugify(state.kw);
+    clusters.forEach(function(c){
+      c.items.sort(function(a,b){return so[a.stage]-so[b.stage]||a.text.length-b.text.length;});
+      c.slug='/'+ps+'/'+slugify(c.key==='more'?'more':c.name.replace(new RegExp(state.kw,'i'),''))+'/';
+      c.items.forEach(function(t){t.slug='/'+slugify(t.text)+'/';});
+    });
+    var total=kept.length, counts={tofu:0,mofu:0,bofu:0}; kept.forEach(function(t){counts[t.stage]++;});
+    state.model={pillar:{title:titleCase(state.kw)+': The Complete Guide',slug:'/'+ps+'/'},clusters:clusters,total:total,counts:counts,all:kept};
+  }
+
+  // ---------- generate ----------
+  function ideas(){return $('ideas').value.split(/\n|,/).map(function(s){return s.trim();}).filter(Boolean);}
+  function run(){
+    var list=ideas();
+    if(!list.length){toast('Add at least one topic idea');$('ideas').focus();return;}
+    state.kw=detectSeed(list);
+    state.terms=list.map(function(s){return {text:s,mine:true};});
+    $('notice').hidden=false; $('notice').textContent='Main topic detected from your ideas: "'+state.kw+'".';
+    build(); render();
+    if(!state.model.total)$('notice').textContent='Add a few more ideas around one main topic.';
+  }
+  // The main topic is the phrase most of the ideas share (longer phrases win ties).
+  function detectSeed(list){
+    var N=list.length, score={};
+    if(N===1)return norm(list[0]).split(' ').slice(0,4).join(' ');
+    list.forEach(function(idea){
+      var w=norm(idea).replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean), seen={};
+      for(var n=3;n>=1;n--)for(var i=0;i+n<=w.length;i++){
+        var g=w.slice(i,i+n); if(STOP.indexOf(g[0])>-1||STOP.indexOf(g[n-1])>-1||/^(what|how|why|best|top|is|for)$/.test(g[0]))continue;
+        var k=g.join(' '); if(!seen[k]){seen[k]=1;score[k]=(score[k]||0)+1;}
+      }
+    });
+    var best='',bs=0;
+    Object.keys(score).forEach(function(k){
+      if(score[k]<2)return;
+      var v=score[k]*(1+0.6*(k.split(' ').length-1));
+      if(v>bs||(v===bs&&k.length>best.length)){bs=v;best=k;}
+    });
+    return best||norm(list[0]).split(' ').slice(0,3).join(' ');
+  }
+
+  // ---------- page render ----------
+  function render(){
+    var m=state.model, has=m&&m.total>0;
+    $('stats').innerHTML=has?'<span class="stat"><b>'+m.clusters.length+'</b> clusters</span><span class="stat"><b>'+m.total+'</b> subtopics</span><span class="stat">'+m.counts.tofu+' · '+m.counts.mofu+' · '+m.counts.bofu+' TOFU/MOFU/BOFU</span>':'';
+    $('pillar').innerHTML=has?'<small>Pillar page</small><h3>'+esc(m.pillar.title)+'</h3><span class="slug">'+esc(m.pillar.slug)+'</span>':'';
+    $('pillar').hidden=!has; $('shot').hidden=!has;
+    $('clusters').innerHTML=has?m.clusters.map(function(c,i){
+      return '<div class="cluster" style="--c:'+c.color+';animation-delay:'+Math.min(i*.04,.3)+'s"><h3><span class="ico" aria-hidden="true">'+esc(c.ico)+'</span>'+esc(c.name)+'<small>'+c.items.length+'</small></h3><span class="slug">'+esc(c.slug)+'</span><ul>'+
+        c.items.map(function(t){return '<li><i class="dot st-'+t.stage+'" title="'+STAGES[t.stage].name+'"></i><span class="t">'+esc(nice(t.text))+'</span>'+'<span class="chip">'+STAGES[t.stage].intent.slice(0,4)+'</span>'+'</li>';}).join('')+'</ul></div>';
+    }).join(''):'<p class="hint">Nothing to map yet.</p>';
+    drawMap();
+  }
+  function setStyle(s){
+    state.style=s; try{localStorage.setItem('tm-style',s);}catch(e){}
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-style')===s));});
+    drawMap();
+  }
+  document.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('.tab');if(b)setStyle(b.getAttribute('data-style'));});
+
+  // ---------- SVG building blocks ----------
+  function defs(W,H){
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" font-family="Instrument Sans, Segoe UI, Helvetica, Arial, sans-serif"><defs>'+
+      '<radialGradient id="bg" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#1a2f63"/><stop offset=".55" stop-color="#0d1a3c"/><stop offset="1" stop-color="#070e22"/></radialGradient>'+
+      '<radialGradient id="aur" cx="15%" cy="0%" r="55%"><stop offset="0" stop-color="#4590a5" stop-opacity=".35"/><stop offset="1" stop-color="#4590a5" stop-opacity="0"/></radialGradient>'+
+      '<linearGradient id="core" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#23386f"/><stop offset="1" stop-color="#4fa3ba"/></linearGradient>'+
+      '<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+      '<filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+      '</defs><rect width="'+W+'" height="'+H+'" fill="url(#bg)"/><rect width="'+W+'" height="'+H+'" fill="url(#aur)"/>';
+  }
+  function header(label){
+    var m=state.model;
+    return '<text x="40" y="54" font-size="13" font-weight="700" letter-spacing="3" fill="#7fd3e6">TOPICAL MAP · '+label+'</text>'+
+      '<text x="40" y="92" font-size="30" font-weight="700" fill="#ffffff">'+esc(m.pillar.title)+'</text>';
+  }
+  function footer(W,H){
+    var m=state.model;
+    return '<text x="40" y="'+(H-26)+'" font-size="14" font-weight="700" fill="#ffffff" fill-opacity=".85">'+m.clusters.length+' clusters · '+m.total+' subtopics</text>'+
+      '<text x="'+(W-40)+'" y="'+(H-26)+'" font-size="12.5" fill="#9fb0cc" text-anchor="end">mohitsseotraining.com · Topical Map Generator</text>';
+  }
+  function more(n){return '+'+n+' more';}
+
+  // Style 1: radial mind map
+  function svgMind(){
+    var m=state.model, cs=m.clusters, PER=7, W=1400, H=1100, cx=700, cy=550;
+    var per=cs.map(function(c){return Math.max(Math.min(c.items.length,PER),3);}), total=per.reduce(function(a,b){return a+b;},0);
+    var s=[defs(W,H)];
+    [130,200,300,430].forEach(function(r,i){s.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#fff" stroke-opacity="'+(i===3?.03:.06)+'" stroke-dasharray="'+(i%2?'2 8':'0')+'"/>');});
+    var a0=-Math.PI/2, gap=0.05, nodes=[];
+    cs.forEach(function(c,i){
+      var span=(2*Math.PI-gap*cs.length)*(per[i]/total), mid=a0+span/2, shown=c.items.slice(0,PER), n=shown.length;
+      var gx=cx+Math.cos(mid)*200, gy=cy+Math.sin(mid)*200;
+      s.push('<line x1="'+cx+'" y1="'+cy+'" x2="'+gx.toFixed(1)+'" y2="'+gy.toFixed(1)+'" stroke="'+c.color+'" stroke-opacity=".7" stroke-width="2.4"/>');
+      shown.forEach(function(t,j){
+        var a=a0+span*((j+0.5)/n), lx=cx+Math.cos(a)*300, ly=cy+Math.sin(a)*300, qx=cx+Math.cos((a+mid)/2)*260, qy=cy+Math.sin((a+mid)/2)*260;
+        s.push('<path d="M'+gx.toFixed(1)+' '+gy.toFixed(1)+' Q'+qx.toFixed(1)+' '+qy.toFixed(1)+' '+lx.toFixed(1)+' '+ly.toFixed(1)+'" stroke="'+c.color+'" stroke-opacity=".45" stroke-width="1.3" fill="none"/>');
+        s.push('<circle cx="'+lx.toFixed(1)+'" cy="'+ly.toFixed(1)+'" r="4.2" fill="'+STAGES[t.stage].color+'" filter="url(#soft)"/>');
+        var deg=a*180/Math.PI, left=Math.cos(a)<0, tx=cx+Math.cos(a)*314, ty=cy+Math.sin(a)*314;
+        s.push('<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" font-size="13.5" fill="#e4edf8" dominant-baseline="middle" text-anchor="'+(left?'end':'start')+'" transform="rotate('+(left?deg+180:deg).toFixed(1)+' '+tx.toFixed(1)+' '+ty.toFixed(1)+')">'+esc(cut(nice(t.text),31))+'</text>');
+      });
+      nodes.push({x:gx,y:gy,c:c,mid:mid});
+      a0+=span+gap;
+    });
+    nodes.forEach(function(n){
+      s.push('<circle cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="52" fill="'+n.c.color+'" fill-opacity=".14"/>');
+      s.push('<circle cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="44" fill="#0f1d40" stroke="'+n.c.color+'" stroke-width="2.5" filter="url(#glow)"/>');
+      s.push('<text x="'+n.x.toFixed(1)+'" y="'+(n.y-6).toFixed(1)+'" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">'+esc(n.c.short)+'</text>');
+      s.push('<text x="'+n.x.toFixed(1)+'" y="'+(n.y+13).toFixed(1)+'" font-size="11.5" fill="'+n.c.color+'" text-anchor="middle" dominant-baseline="middle" font-weight="600">'+n.c.items.length+' topics</text>');
+      if(n.c.items.length>PER){var mx=cx+Math.cos(n.mid)*255,my=cy+Math.sin(n.mid)*255;s.push('<text x="'+mx.toFixed(1)+'" y="'+my.toFixed(1)+'" font-size="11.5" fill="#9fb0cc" text-anchor="middle" dominant-baseline="middle">'+more(n.c.items.length-PER)+'</text>');}
+    });
+    s.push('<circle cx="'+cx+'" cy="'+cy+'" r="112" fill="#7fd3e6" fill-opacity=".07"/><circle cx="'+cx+'" cy="'+cy+'" r="96" fill="none" stroke="#7fd3e6" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="3 6"/>');
+    s.push('<circle cx="'+cx+'" cy="'+cy+'" r="84" fill="url(#core)" stroke="#bfeaf4" stroke-opacity=".6" stroke-width="2" filter="url(#glow)"/>');
+    var lines=wrap(titleCase(state.kw),13).slice(0,3);
+    lines.forEach(function(l,i){s.push('<text x="'+cx+'" y="'+(cy-8+(i-(lines.length-1)/2)*22)+'" font-size="20" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">'+esc(l)+'</text>');});
+    s.push('<text x="'+cx+'" y="'+(cy+8+lines.length*11)+'" font-size="11" letter-spacing="2" fill="#bfeaf4" text-anchor="middle" dominant-baseline="middle">PILLAR</text>');
+    s.push('<text x="40" y="54" font-size="13" font-weight="700" letter-spacing="3" fill="#7fd3e6">TOPICAL MAP · MIND MAP</text>');
+    s.push(legend(W-40,54,'end'));
+    s.push(footer(W,H)+'</svg>');
+    return [s.join(''),W,H];
+  }
+  function wrap(text,n){var out=[],cur='';text.split(' ').forEach(function(w){if((cur+' '+w).trim().length>n){if(cur)out.push(cur);cur=w;}else cur=(cur+' '+w).trim();});if(cur)out.push(cur);return out;}
+  function legend(x,y,anchor){
+    var items=[['tofu','Awareness'],['mofu','Consideration'],['bofu','Decision']], s='', w=0;
+    var widths=items.map(function(i){return i[1].length*7+30;}); var total=widths.reduce(function(a,b){return a+b;},0);
+    var sx=anchor==='end'?x-total:x;
+    items.forEach(function(it,i){s+='<circle cx="'+(sx+w+6)+'" cy="'+(y-4)+'" r="5" fill="'+STAGES[it[0]].color+'"/><text x="'+(sx+w+16)+'" y="'+y+'" font-size="12.5" fill="#c9d6ea">'+it[1]+'</text>';w+=widths[i];});
+    return s;
+  }
+
+  // Style 2: hierarchy tree (pillar → clusters → subtopics)
+  function svgTree(){
+    var m=state.model, PER=10, ROW=32, GAP=22, top=150, W=1400;
+    var blocks=m.clusters.map(function(c){var n=Math.min(c.items.length,PER)+(c.items.length>PER?1:0);return Math.max(n,1)*ROW;});
+    var bodyH=blocks.reduce(function(a,b){return a+b;},0)+GAP*(blocks.length-1), H=top+bodyH+90;
+    var s=[defs(W,H),header('TREE'),legend(W-40,54,'end')];
+    var py=top+bodyH/2, y=top;
+    var pl=wrap(titleCase(state.kw),16).slice(0,3), ph=60+pl.length*24;
+    m.clusters.forEach(function(c,i){
+      var cyy=y+blocks[i]/2, shown=c.items.slice(0,PER);
+      s.push('<path d="M290 '+py.toFixed(1)+' C335 '+py.toFixed(1)+' 335 '+cyy.toFixed(1)+' 380 '+cyy.toFixed(1)+'" stroke="'+c.color+'" stroke-opacity=".7" stroke-width="2" fill="none"/>');
+      shown.forEach(function(t,j){
+        var ly=y+j*ROW+ROW/2, label=cut(nice(t.text),74), w=Math.min(label.length*7.3+34,610);
+        s.push('<path d="M650 '+cyy.toFixed(1)+' C695 '+cyy.toFixed(1)+' 695 '+ly.toFixed(1)+' 740 '+ly.toFixed(1)+'" stroke="'+c.color+'" stroke-opacity=".4" stroke-width="1.3" fill="none"/>');
+        s.push('<rect x="740" y="'+(ly-12).toFixed(1)+'" width="'+w.toFixed(0)+'" height="24" rx="12" fill="#ffffff" fill-opacity=".05" stroke="'+c.color+'" stroke-opacity=".35"/>');
+        s.push('<circle cx="756" cy="'+ly.toFixed(1)+'" r="4.5" fill="'+STAGES[t.stage].color+'"/>');
+        s.push('<text x="768" y="'+ly.toFixed(1)+'" font-size="13.5" fill="#e4edf8" dominant-baseline="middle">'+esc(label)+'</text>');
+      });
+      if(c.items.length>PER){var my=y+PER*ROW+ROW/2;s.push('<text x="756" y="'+my+'" font-size="12.5" fill="#9fb0cc" dominant-baseline="middle">'+more(c.items.length-PER)+' in the CSV</text>');}
+      s.push('<rect x="380" y="'+(cyy-24).toFixed(1)+'" width="270" height="48" rx="14" fill="#0f1d40" stroke="'+c.color+'" stroke-width="2"/>');
+      s.push('<rect x="380" y="'+(cyy-24).toFixed(1)+'" width="6" height="48" rx="3" fill="'+c.color+'"/>');
+      s.push('<text x="400" y="'+(cyy-5).toFixed(1)+'" font-size="15" font-weight="700" fill="#ffffff" dominant-baseline="middle">'+esc(cut(c.name,26))+'</text>');
+      s.push('<text x="400" y="'+(cyy+13).toFixed(1)+'" font-size="11.5" fill="'+c.color+'" dominant-baseline="middle" font-weight="600">'+c.items.length+' subtopics</text>');
+      y+=blocks[i]+GAP;
+    });
+    s.push('<rect x="40" y="'+(py-ph/2).toFixed(1)+'" width="250" height="'+ph+'" rx="18" fill="url(#core)" stroke="#bfeaf4" stroke-opacity=".6" stroke-width="2" filter="url(#glow)"/>');
+    s.push('<text x="62" y="'+(py-ph/2+28).toFixed(1)+'" font-size="11" letter-spacing="2" fill="#bfeaf4" font-weight="700">PILLAR</text>');
+    pl.forEach(function(l,i){s.push('<text x="62" y="'+(py-ph/2+56+i*24).toFixed(1)+'" font-size="20" font-weight="700" fill="#ffffff">'+esc(l)+'</text>');});
+    s.push(footer(W,H)+'</svg>');
+    return [s.join(''),W,H];
+  }
+
+  // Style 3: content silos (pillar banner, one column per cluster)
+  function svgSilo(){
+    var m=state.model, n=m.clusters.length, PER=9, W=1400, G=20, ROW=34;
+    var cols=n<=4?Math.max(n,1):(n<=6?3:4), colW=(1320-(cols-1)*G)/cols, chars=Math.floor((colW-46)/7.1);
+    var rows=[]; for(var i=0;i<n;i+=cols)rows.push(m.clusters.slice(i,i+cols));
+    var hOf=function(c){return 66+Math.min(c.items.length,PER)*ROW+(c.items.length>PER?ROW:0)+12;};
+    var rowH=rows.map(function(r){return Math.max.apply(null,r.map(hOf));});
+    var top=286, H=top+rowH.reduce(function(a,b){return a+b;},0)+G*2*(rows.length-1)+90;
+    var s=[defs(W,H),header('SILO'),legend(W-40,54,'end')];
+    s.push('<rect x="40" y="130" width="1320" height="100" rx="20" fill="url(#core)" stroke="#bfeaf4" stroke-opacity=".5" stroke-width="2" filter="url(#glow)"/>');
+    s.push('<text x="700" y="168" font-size="12" letter-spacing="3" fill="#bfeaf4" text-anchor="middle" font-weight="700">PILLAR PAGE</text>');
+    s.push('<text x="700" y="200" font-size="26" font-weight="700" fill="#ffffff" text-anchor="middle">'+esc(titleCase(state.kw))+'</text>');
+    s.push('<text x="700" y="221" font-size="12.5" fill="#dfeaf6" fill-opacity=".8" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace">'+esc(m.pillar.slug)+'</text>');
+    var y=top;
+    rows.forEach(function(r,ri){
+      var rw=r.length*colW+(r.length-1)*G, x0=700-rw/2;
+      r.forEach(function(c,ci){
+        var x=x0+ci*(colW+G), h=hOf(c), mx=x+colW/2;
+        if(!ri)s.push('<path d="M700 230 V'+(top-28)+' H'+mx.toFixed(1)+' V'+y+'" stroke="'+c.color+'" stroke-opacity="'+(ri?'.25':'.6')+'" stroke-width="1.6" fill="none" stroke-dasharray="'+(ri?'3 5':'0')+'"/>');
+        s.push('<rect x="'+x.toFixed(1)+'" y="'+y+'" width="'+colW.toFixed(1)+'" height="'+h+'" rx="18" fill="#ffffff" fill-opacity=".05" stroke="'+c.color+'" stroke-opacity=".55" stroke-width="1.5"/>');
+        s.push('<path d="M'+x.toFixed(1)+' '+(y+56)+' V'+(y+18)+' a18 18 0 0 1 18 -18 H'+(x+colW-18).toFixed(1)+' a18 18 0 0 1 18 18 V'+(y+56)+' Z" fill="'+c.color+'" fill-opacity=".22"/>');
+        s.push('<circle cx="'+(x+30).toFixed(1)+'" cy="'+(y+28)+'" r="15" fill="'+c.color+'"/><text x="'+(x+30).toFixed(1)+'" y="'+(y+29)+'" font-size="14" font-weight="700" fill="#0c1836" text-anchor="middle" dominant-baseline="middle">'+esc(c.ico)+'</text>');
+        s.push('<text x="'+(x+54).toFixed(1)+'" y="'+(y+24)+'" font-size="15" font-weight="700" fill="#ffffff" dominant-baseline="middle">'+esc(cut(c.name,Math.floor((colW-70)/8.4)))+'</text>');
+        s.push('<text x="'+(x+54).toFixed(1)+'" y="'+(y+42)+'" font-size="11.5" fill="#dfeaf6" fill-opacity=".8" dominant-baseline="middle">'+c.items.length+' subtopics</text>');
+        c.items.slice(0,PER).forEach(function(t,j){
+          var ly=y+66+j*ROW+ROW/2-4;
+          if(j)s.push('<line x1="'+(x+16).toFixed(1)+'" y1="'+(ly-ROW/2).toFixed(1)+'" x2="'+(x+colW-16).toFixed(1)+'" y2="'+(ly-ROW/2).toFixed(1)+'" stroke="#fff" stroke-opacity=".06"/>');
+          s.push('<circle cx="'+(x+22).toFixed(1)+'" cy="'+ly+'" r="4.5" fill="'+STAGES[t.stage].color+'"/>');
+          s.push('<text x="'+(x+34).toFixed(1)+'" y="'+ly+'" font-size="13.5" fill="#e4edf8" dominant-baseline="middle">'+esc(cut(nice(t.text),chars))+'</text>');
+        });
+        if(c.items.length>PER)s.push('<text x="'+(x+34).toFixed(1)+'" y="'+(y+66+PER*ROW+ROW/2-4)+'" font-size="12.5" fill="#9fb0cc" dominant-baseline="middle">'+more(c.items.length-PER)+'</text>');
+      });
+      y+=rowH[ri]+G*2;
+    });
+    s.push(footer(W,H)+'</svg>');
+    return [s.join(''),W,H];
+  }
+
+  // Style 4: funnel (subtopics sorted by buyer stage)
+  function svgFunnel(){
+    var m=state.model, W=1400, CAP=28, top=140, inset=60, PH=32, RG=10;
+    var bands=['tofu','mofu','bofu'].map(function(k){
+      var list=m.all.filter(function(t){return t.stage===k;}).sort(function(a,b){return a.text.length-b.text.length;});
+      return {k:k,list:list};
+    });
+    var s=[defs(W,1),header('FUNNEL')], y=top, tw=1320, parts=[];
+    bands.forEach(function(b){
+      var bw=tw-2*inset, areaW=bw-80, shown=b.list.slice(0,CAP), pills=shown.map(function(t){var l=cut(nice(t.text),44);return {l:l,w:Math.min(l.length*7.2+30,areaW)};});
+      if(b.list.length>CAP)pills.push({l:more(b.list.length-CAP),w:90,m:1});
+      var rows=[],cur=[],cw=0;
+      pills.forEach(function(p){if(cw+p.w+(cur.length?RG:0)>areaW&&cur.length){rows.push([cur,cw]);cur=[];cw=0;}cw+=p.w+(cur.length?RG:0);cur.push(p);});
+      if(cur.length)rows.push([cur,cw]);
+      var h=72+Math.max(rows.length,1)*(PH+RG)+14, x0=700-tw/2, st=STAGES[b.k];
+      parts.push('<path d="M'+x0+' '+y+' H'+(x0+tw)+' L'+(x0+tw-inset)+' '+(y+h)+' H'+(x0+inset)+' Z" fill="'+st.color+'" fill-opacity=".08" stroke="'+st.color+'" stroke-opacity=".55" stroke-width="1.5" stroke-linejoin="round"/>');
+      parts.push('<text x="700" y="'+(y+34)+'" font-size="17" font-weight="700" fill="#ffffff" text-anchor="middle">'+st.name+'  <tspan fill="'+st.color+'">'+st.tag+'</tspan>  <tspan font-size="13" font-weight="500" fill="#9fb0cc">'+b.list.length+' subtopics · '+st.intent+' intent</tspan></text>');
+      if(!rows.length)parts.push('<text x="700" y="'+(y+78)+'" font-size="13.5" fill="#9fb0cc" text-anchor="middle" font-style="italic">No subtopics at this stage yet. Add a few ideas for it.</text>');
+      rows.forEach(function(r,ri){
+        var px=700-r[1]/2, py=y+58+ri*(PH+RG);
+        r[0].forEach(function(p){
+          parts.push('<rect x="'+px.toFixed(1)+'" y="'+py+'" width="'+p.w.toFixed(1)+'" height="'+PH+'" rx="16" fill="'+(p.m?'#ffffff':st.color)+'" fill-opacity="'+(p.m?'.04':'.16')+'" stroke="'+st.color+'" stroke-opacity="'+(p.m?'.3':'.6')+'"/>');
+          parts.push('<text x="'+(px+p.w/2).toFixed(1)+'" y="'+(py+PH/2+1)+'" font-size="13.5" fill="'+(p.m?'#9fb0cc':'#eef3fb')+'" text-anchor="middle" dominant-baseline="middle">'+esc(p.l)+'</text>');
+          px+=p.w+RG;
+        });
+      });
+      y+=h+18; tw=bw;
+    });
+    var H=y+70;
+    s[0]=defs(W,H);
+    s.push(parts.join(''),footer(W,H),'</svg>');
+    return [s.join(''),W,H];
+  }
+
+  function drawMap(){
+    var m=state.model;
+    if(!m||!m.total){$('mapImg').removeAttribute('src');lastSvg='';return;}
+    var r=state.style==='tree'?svgTree():state.style==='silo'?svgSilo():state.style==='funnel'?svgFunnel():svgMind();
+    lastSvg=r[0]; lastW=r[1]; lastH=r[2];
+    $('mapImg').src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(lastSvg);
+    $('mapImg').alt='Topical map for '+state.kw+' ('+state.style+' style)';
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-style')===state.style));});
+  }
+
+  // ---------- outline + CSV ----------
+  function outlineText(){
+    var m=state.model; if(!m)return '';
+    var out=['PILLAR: '+m.pillar.title+'  '+m.pillar.slug];
+    m.clusters.forEach(function(c,i){
+      out.push('','CLUSTER '+(i+1)+': '+c.name+'  '+c.slug);
+      c.items.forEach(function(t){out.push('  - '+nice(t.text)+'  ['+STAGES[t.stage].intent+' · '+STAGES[t.stage].tag+']  '+t.slug);});
+    });
+    return out.join('\n');
+  }
+  $('copyOutline').addEventListener('click',function(){
+    var text=outlineText();
+    try{navigator.clipboard.writeText(text).then(function(){toast('Outline copied');},function(){toast('Copy is blocked here. It works on the live tool.');});}
+    catch(e){toast('Copy is blocked here. It works on the live tool.');}
+  });
+  function csvCell(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+  $('csv').addEventListener('click',function(){
+    var m=state.model; if(!m)return;
+    var rows=[['Pillar','Pillar URL','Cluster','Cluster URL','Subtopic','Intent','Funnel stage','Suggested URL']];
+    m.clusters.forEach(function(c){c.items.forEach(function(t){rows.push([m.pillar.title,m.pillar.slug,c.name,c.slug,nice(t.text),STAGES[t.stage].intent,STAGES[t.stage].tag,t.slug]);});});
+    var csv='﻿'+rows.map(function(r){return r.map(csvCell).join(',');}).join('\n');
+    save(URL.createObjectURL(new Blob([csv],{type:'text/csv'})),fileBase()+'.csv');
+  });
+
+  // ---------- form ----------
+  $('form').addEventListener('submit',function(e){
+    e.preventDefault();
+    run();
+  });
+
+  // ---------- pop-up and downloads ----------
+  var SIZES=[[1,'Standard'],[2,'HD'],[3,'Print']];
+  function openModal(){
+    if(!lastSvg)return;
+    $('bigImg').src=$('mapImg').src; $('modalTitle').textContent='Topical map: '+titleCase(state.kw);
+    var cur=+$('dlSize').value||2;
+    $('dlSize').innerHTML=SIZES.map(function(z){return '<option value="'+z[0]+'"'+(z[0]===cur?' selected':'')+'>'+z[1]+' ('+lastW*z[0]+' × '+Math.round(lastH*z[0])+')</option>';}).join('');
+    $('modal').hidden=false; $('closeModal').focus();
+  }
+  function closeModal(){ $('modal').hidden=true; $('shotBtn').focus(); }
+  $('shotBtn').addEventListener('click',openModal);
+  $('closeModal').addEventListener('click',closeModal);
+  $('modal').addEventListener('click',function(e){ if(e.target===this)closeModal(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!$('modal').hidden)closeModal(); });
+  function fileBase(){return 'topical-map-'+state.style+'-'+state.kw.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  function save(href,name){
+    try{var a=document.createElement('a');a.href=href;a.download=name;document.body.appendChild(a);a.click();a.remove();toast('Downloading '+name);}
+    catch(err){toast('Download is blocked here. It works on the live tool.');}
+  }
+  function raster(scale,mime,cb){
+    var img=new Image();
+    img.onload=function(){
+      var c=document.createElement('canvas');c.width=lastW*scale;c.height=Math.round(lastH*scale);
+      var ctx=c.getContext('2d');ctx.fillStyle='#070e22';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);
+      cb(c.toDataURL(mime,0.95),c.width,c.height);
+    };
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(lastSvg);
+  }
+  $('modal').addEventListener('click',function(e){
+    var b=e.target.closest('[data-fmt]'); if(!b||!lastSvg)return;
+    var f=b.getAttribute('data-fmt'), scale=+$('dlSize').value||2, base=fileBase();
+    if(f==='svg'){ save(URL.createObjectURL(new Blob([lastSvg],{type:'image/svg+xml'})),base+'.svg'); return; }
+    if(f==='pdf'){
+      raster(scale,'image/jpeg',function(url,w,h){
+        if(!window.jspdf){toast('PDF export is still loading. Try again in a moment.');return;}
+        try{var pdf=new window.jspdf.jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],hotfixes:['px_scaling']});pdf.addImage(url,'JPEG',0,0,w,h);pdf.save(base+'.pdf');toast('Downloading '+base+'.pdf');}
+        catch(err){toast('Download is blocked here. It works on the live tool.');}
+      });
+      return;
+    }
+    var mime=f==='jpg'?'image/jpeg':f==='webp'?'image/webp':'image/png';
+    raster(scale,mime,function(url){ save(url,base+'.'+f); });
+  });
+
+  // ---------- sample data ----------
+  var SAMPLE=['what is keyword research','keyword research meaning','types of keywords in keyword research','keyword research examples','why keyword research is important','benefits of keyword research',
+    'how to do keyword research','keyword research process','keyword research strategy','keyword research checklist','keyword research tips','how to do keyword research for a blog post','keyword research mistakes',
+    'keyword research for youtube','keyword research for ecommerce','keyword research for local seo','keyword research for small business','keyword research for beginners','keyword research for amazon',
+    'keyword research tools','free keyword research tools','best keyword research tools','keyword research chrome extension','google keyword planner tool','keyword research template',
+    'semrush vs ahrefs keyword research','keyword research vs keyword analysis','ubersuggest keyword research review','keyword research alternatives to google keyword planner',
+    'keyword research with chatgpt','keyword research in 2026','ai keyword research','future of keyword research','is keyword research dead',
+    'keyword research course','keyword research certification','keyword research jobs','keyword research interview questions',
+    'keyword research services','keyword research cost','keyword research agency','keyword research pricing'];
+  function loadSample(){
+    state.kw='keyword research';
+    state.terms=SAMPLE.map(function(s){return {text:s,mine:false};});
+    $('notice').hidden=false;
+    $('notice').textContent='Example map for "keyword research". Drop your topic ideas above, one per line, and press Generate map.';
+    build(); render();
+  }
+  setStyle(state.style);
+  loadSample();
+})();
+</script>
+</body></html>
